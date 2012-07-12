@@ -10,12 +10,33 @@
 
 int main(int argc, char **argv) {
     int cbuff_size = 0;
-    
+    cbuff_t cbuff;
+
     cbuff_size = atoi(argv[1]);
     
-    cbuff_t cbuff;
     cbuff_init(&cbuff, cbuff_size);
-    cbuff_add(&cbuff, 0);
+    cbuff_inspect(&cbuff);
+    
+    cbuff_add(&cbuff, 1);
+    cbuff_inspect(&cbuff);
+
+    cbuff_add(&cbuff, 2);
+    cbuff_inspect(&cbuff);
+
+    cbuff_add(&cbuff, 3);
+    cbuff_inspect(&cbuff);
+
+    cbuff_remove(&cbuff);
+    cbuff_inspect(&cbuff);
+    
+    cbuff_remove(&cbuff);
+    cbuff_inspect(&cbuff);
+
+    cbuff_add(&cbuff, 4);
+    cbuff_inspect(&cbuff);
+
+    cbuff_add(&cbuff, 777777777);
+    cbuff_inspect(&cbuff);
 
     return 0;
 }
