@@ -1,22 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "cbuff.h"
 
 // http://code.google.com/p/mongoose/
 // http://stackoverflow.com/questions/7315936/which-of-sprintf-snprintf-is-more-secure
 // http://stackoverflow.com/a/4627539/152142
 // http://news.ycombinator.com/item?id=3970870
 
+
 int main(int argc, char **argv) {
     int cbuff_size = 0;
-    int* cbuff = NULL;
-
+    
     cbuff_size = atoi(argv[1]);
-
-    printf("circular buffer size: %d\n", cbuff_size);
-
-    cbuff = (int*) malloc (sizeof(int) * cbuff_size);
-
-    free(cbuff);
+    
+    cbuff_t cbuff;
+    cbuff_init(&cbuff, cbuff_size);
+    cbuff_add(&cbuff, 0);
 
     return 0;
 }
