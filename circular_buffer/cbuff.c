@@ -4,10 +4,13 @@
 
 const int EMPTY = -1;
 
-//update 'oldest' after removing the oldest element. 
-void update_oldest(cbuff_t* self) {
+//update 'oldest' AFTER REMOVING the oldest element. 
+void update_oldest_after_remove(cbuff_t* self) {
     if (self->oldest == self->last) { 
-        /* do nothing */ 
+        //we just removed the last element, which was also the oldest,
+        //so there are no elements left.
+        self->last = EMPTY;
+        self->oldest = EMPTY;
     }
     else if (self->oldest + 1 < self->size) { 
         self->oldest += 1; /* just increment. */
@@ -19,7 +22,7 @@ void update_oldest(cbuff_t* self) {
     //printf("ERROR: unexpected state: oldest=%d last=%d \n", self->oldest, self->last);
 }
 
-//update 'last' after appending an element. 
+//update 'last' BEFORE APPENDING an element. 
 void update_last(cbuff_t* self) {
     int i = 0;
 
@@ -28,7 +31,7 @@ void update_last(cbuff_t* self) {
     /* if we wrapped around to the oldest element, it is no longer 
      * the oldest, because we are overwriting it. */
     if (i == self->oldest) { 
-        update_oldest(self);
+        update_oldest_after_remove(self);
     }
 
     self->last = i;
@@ -60,7 +63,7 @@ void cbuff_add(cbuff_t* self, int element) {
     self->buffer[self->last] = element;
     //special case
     if (EMPTY == self->oldest) {
-        update_oldest(self);
+        update_oldest_after_remove(self);
     }
 }
 
@@ -71,7 +74,7 @@ void cbuff_remove(cbuff_t* self) {
     }
     //critical section
     self->buffer[self->oldest] = EMPTY;
-    update_oldest(self);
+    update_oldest_after_remove(self);
 }
 
 void cbuff_inspect(cbuff_t* self) {
@@ -81,12 +84,20 @@ void cbuff_inspect(cbuff_t* self) {
     
     for (i = 0; i < self->size; i++) {
         if (EMPTY == self->buffer[i]) {
-            if (i == self->last) {
+            if (i == self->oldest) {
+                if (i == self->last) {
+                    printf("[:]");
+                }
+                else { 
+                    printf("[_]"); 
+                }
+            }
+            else if (i == self->last) {
                 if (i == self->oldest) {
-                    printf("[^]");
+                    printf("[:]");
                 }
                 else {
-                    printf(" ^ ");
+                    printf(":_:");
                 }
             }
             else {
