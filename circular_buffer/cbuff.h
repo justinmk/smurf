@@ -1,8 +1,16 @@
 #include <stdlib.h>
 
+/* Circular Buffer: http://en.wikipedia.org/wiki/Circular_buffer
+ *     - FIFO
+ *     - "The "prized" attribute of a circular buffer is that it 
+ *       does not need to have its elements shuffled around when one is consumed" 
+ *     - queue with fixed maximum size 
+ */
+
 typedef struct {
     int size; /* fixed size (length) of the circular buffer */
     int last; /* points to the last element */
+    int oldest; /* points to the oldest element */
     int* buffer; /* points to buffer storage array */
 } cbuff_t;
 
