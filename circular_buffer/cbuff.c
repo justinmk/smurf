@@ -11,11 +11,8 @@ void update_first_after_remove(cbuff_t* self) {
         self->last = EMPTY;
         self->first = EMPTY;
     }
-    else if (self->first + 1 < self->size) { 
-        self->first += 1; /* just increment. */
-    }
-    else { /* loop around */
-        self->first = 0;
+    else { /* just increment. */
+        self->first = (self->first + 1) % self->size;
     }
     /* first !> last */
     //printf("ERROR: unexpected state: first=%d last=%d \n", self->first, self->last);
@@ -104,7 +101,10 @@ void cbuff_inspect(cbuff_t* self) {
             }
         } 
         else {
-            if (i == self->first) {
+            if (i == self->first && i == self->last) {
+                printf("[%d:", self->buffer[i]);
+            }
+            else if (i == self->first) {
                 printf("[%d]", self->buffer[i]);
             }
             else if (i == self->last) {

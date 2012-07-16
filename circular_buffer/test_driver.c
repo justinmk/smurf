@@ -98,10 +98,13 @@ int main(int argc, char **argv) {
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
     
-    cbuff_remove(&cbuff);
+    cbuff_add(&cbuff, 1);
     cbuff_inspect(&cbuff);
     
     cbuff_remove(&cbuff);
+    cbuff_inspect(&cbuff);
+    
+    cbuff_add(&cbuff, 1);
     cbuff_inspect(&cbuff);
     
     return 0;
