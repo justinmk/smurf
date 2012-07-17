@@ -2,32 +2,28 @@
 #include <stdlib.h>
 #include "cbuff.h"
 
-const int EMPTY = -1;
-
-void update_first_after_remove(cbuff_t* self) {
-    if (self->first == self->last) { 
-        //we just removed the last element, which was also the first,
-        //so there are no elements left.
-        self->last = EMPTY;
-        self->first = EMPTY;
-    }
-    else { /* just increment. */
+void inc_first(cbuff_t* self) {
+    if (self->first != self->last) {
         self->first = (self->first + 1) % self->size;
     }
-    /* first !> last */
-    //printf("ERROR: unexpected state: first=%d last=%d \n", self->first, self->last);
+    else {
+        /* else, we just removed the last element, which was also the first,
+           so there are no elements left. */
+        self->last = CBUFF_EMPTY;
+        self->first = CBUFF_EMPTY;
+    }
 }
 
-//update 'last' BEFORE APPENDING an element. 
-void update_last_before_add(cbuff_t* self) {
+//update 'last' BEFORE APPENDING an element.
+void inc_last(cbuff_t* self) {
     int i = 0;
 
     i = (self->last + 1) % self->size;
 
-    /* if we wrapped around to the first element, it is now "last" and 
+    /* if we wrapped around to the first element, it is now "last" and
        the next element becomes "first". */
-    if (i == self->first) { 
-        update_first_after_remove(self);
+    if (i == self->first) {
+        inc_first(self);
     }
 
     self->last = i;
@@ -35,57 +31,63 @@ void update_last_before_add(cbuff_t* self) {
 
 void cbuff_init(cbuff_t* self, int size) {
     int i = 0;
-    
-    self->last = EMPTY;
-    self->first = EMPTY;
+
+    self->first = CBUFF_EMPTY;
+    self->last = CBUFF_EMPTY;
     self->size = size;
     self->buffer = (int*) malloc(sizeof(int) * size);
     /* clear the buffer contents */
     for (i = 0; i < self->size; i++) {
-        self->buffer[i] = EMPTY;
+        self->buffer[i] = CBUFF_EMPTY;
     }
 }
 
 void cbuff_dispose(cbuff_t* self) {
-    self->last = 0; 
-    self->first = 0;
+    self->first = CBUFF_EMPTY;
+    self->last = CBUFF_EMPTY;
     self->size = 0;
     free(self->buffer);
 }
 
 void cbuff_add(cbuff_t* self, int element) {
     //critical section
-    update_last_before_add(self);
+    inc_last(self);
     self->buffer[self->last] = element;
-    //special case
-    if (EMPTY == self->first) {
-        update_first_after_remove(self);
+    //special case: an CBUFF_EMPTY cbuff
+    if (CBUFF_EMPTY == self->first) {
+        inc_first(self);
     }
 }
 
-void cbuff_remove(cbuff_t* self) {
+int cbuff_remove(cbuff_t* self) {
+    int val = CBUFF_EMPTY;
+
     //special case
-    if (EMPTY == self->first) {
-        return; //do nothing
+    if (CBUFF_EMPTY == self->first) {
+        return CBUFF_EMPTY; //do nothing
     }
+
     //critical section
-    self->buffer[self->first] = EMPTY;
-    update_first_after_remove(self);
+    val = self->buffer[self->first];
+    self->buffer[self->first] = CBUFF_EMPTY;
+    inc_first(self);
+
+    return val;
 }
 
 void cbuff_inspect(cbuff_t* self) {
     int i = 0;
-    
+
     printf("circular buffer contents: ");
-    
+
     for (i = 0; i < self->size; i++) {
-        if (EMPTY == self->buffer[i]) {
+        if (CBUFF_EMPTY == self->buffer[i]) {
             if (i == self->first) {
                 if (i == self->last) {
                     printf("[:]");
                 }
-                else { 
-                    printf("[_]"); 
+                else {
+                    printf("[_]");
                 }
             }
             else if (i == self->last) {
@@ -99,7 +101,7 @@ void cbuff_inspect(cbuff_t* self) {
             else {
                 printf(" _ ");
             }
-        } 
+        }
         else {
             if (i == self->first && i == self->last) {
                 printf("[%d:", self->buffer[i]);
@@ -118,7 +120,7 @@ void cbuff_inspect(cbuff_t* self) {
             printf(" ");
         }
     }
-    
+
     printf("\n");
 }
 

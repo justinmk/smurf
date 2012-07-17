@@ -13,22 +13,26 @@ int main(int argc, char **argv) {
     cbuff_t cbuff;
 
     cbuff_size = atoi(argv[1]);
-    
+
     cbuff_init(&cbuff, cbuff_size);
     cbuff_inspect(&cbuff);
-    
-    cbuff_remove(&cbuff);
+
+    if (CBUFF_EMPTY != cbuff_remove(&cbuff)) {
+        printf("ERROR");
+    }
     cbuff_inspect(&cbuff);
-    
+
     cbuff_add(&cbuff, 1);
+    cbuff_inspect(&cbuff);
+
+    if (1 != cbuff_remove(&cbuff)) {
+        printf("ERROR");
+    }
     cbuff_inspect(&cbuff);
 
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
-    
+
     cbuff_add(&cbuff, 1);
     cbuff_inspect(&cbuff);
 
@@ -38,10 +42,14 @@ int main(int argc, char **argv) {
     cbuff_add(&cbuff, 3);
     cbuff_inspect(&cbuff);
 
-    cbuff_remove(&cbuff);
+    if (1 != cbuff_remove(&cbuff)) {
+        printf("ERROR");
+    }
     cbuff_inspect(&cbuff);
-    
-    cbuff_remove(&cbuff);
+
+    if (2 != cbuff_remove(&cbuff)) {
+        printf("ERROR");
+    }
     cbuff_inspect(&cbuff);
 
     cbuff_add(&cbuff, 4);
@@ -74,43 +82,45 @@ int main(int argc, char **argv) {
     cbuff_add(&cbuff, 3);
     cbuff_inspect(&cbuff);
 
+    if (5 != cbuff_remove(&cbuff)) {
+        printf("ERROR: oldest element should be 5");
+    }
+    cbuff_inspect(&cbuff);
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
-    
+
     cbuff_add(&cbuff, 1);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_remove(&cbuff);
     cbuff_inspect(&cbuff);
-    
+
     cbuff_add(&cbuff, 1);
     cbuff_inspect(&cbuff);
-    
+
     return 0;
 }
 
-// http://linux.die.net/man/3/snprintf 
+// http://linux.die.net/man/3/snprintf
 
 //#include <stdio.h>
 //#include <stdlib.h>
