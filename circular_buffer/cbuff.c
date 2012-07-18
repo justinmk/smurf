@@ -29,9 +29,11 @@ void inc_last(cbuff_t* self) {
     self->last = i;
 }
 
-void cbuff_init(cbuff_t* self, int size) {
+cbuff_t* cbuff_init(int size) {
     int i = 0;
+    cbuff_t* self;
 
+    self = (cbuff_t*) malloc(sizeof(cbuff_t));
     self->first = CBUFF_EMPTY;
     self->last = CBUFF_EMPTY;
     self->size = size;
@@ -40,6 +42,8 @@ void cbuff_init(cbuff_t* self, int size) {
     for (i = 0; i < self->size; i++) {
         self->buffer[i] = CBUFF_EMPTY;
     }
+
+    return self;
 }
 
 void cbuff_dispose(cbuff_t* self) {

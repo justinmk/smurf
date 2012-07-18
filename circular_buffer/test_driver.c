@@ -3,119 +3,127 @@
 #include "cbuff.h"
 
 // http://code.google.com/p/mongoose/
-// http://stackoverflow.com/questions/7315936/which-of-sprintf-snprintf-is-more-secure
+// http://stackoverflow.com/questions/7315936/which-of-fprintf-snprintf-is-more-secure
 // http://stackoverflow.com/a/4627539/152142
 // http://news.ycombinator.com/item?id=3970870
 
 
 int main(int argc, char **argv) {
     int cbuff_size = 0;
-    cbuff_t cbuff;
+    cbuff_t* cbuff;
 
     cbuff_size = atoi(argv[1]);
 
-    cbuff_init(&cbuff, cbuff_size);
-    cbuff_inspect(&cbuff);
+    cbuff = cbuff_init(cbuff_size);
+    cbuff_inspect(cbuff);
 
-    if (CBUFF_EMPTY != cbuff_remove(&cbuff)) {
-        printf("ERROR");
+    if (CBUFF_EMPTY != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be CBUFF_EMPTY\n");
     }
-    cbuff_inspect(&cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 1);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 1);
+    cbuff_inspect(cbuff);
 
-    if (1 != cbuff_remove(&cbuff)) {
-        printf("ERROR");
+    if (1 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 1\n");
     }
-    cbuff_inspect(&cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    cbuff_remove(cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 1);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 1);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 2);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 2);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 3);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 3);
+    cbuff_inspect(cbuff);
 
-    if (1 != cbuff_remove(&cbuff)) {
-        printf("ERROR");
+    if (1 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 1\n");
     }
-    cbuff_inspect(&cbuff);
+    cbuff_inspect(cbuff);
 
-    if (2 != cbuff_remove(&cbuff)) {
-        printf("ERROR");
+    if (2 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 2\n");
     }
-    cbuff_inspect(&cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 4);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 4);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 5);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 5);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 6);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 6);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 7);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 7);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 8);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 8);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 9);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 9);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 0);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 0);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 1);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 1);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 2);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 2);
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 3);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 3);
+    cbuff_inspect(cbuff);
 
-    if (5 != cbuff_remove(&cbuff)) {
-        printf("ERROR: oldest element should be 5");
+    if (5 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 5\n");
     }
-    cbuff_inspect(&cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    cbuff_remove(cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    cbuff_remove(cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    cbuff_remove(cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    cbuff_remove(cbuff);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    if (0 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 0\n");
+    }
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    if (1 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 1\n");
+    }
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    if (2 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 2\n");
+    }
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 1);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 1);
+    cbuff_inspect(cbuff);
 
-    cbuff_remove(&cbuff);
-    cbuff_inspect(&cbuff);
+    if (3 != cbuff_remove(cbuff)) {
+        fprintf(stderr, "ERROR: oldest element should be 3\n");
+    }
+    cbuff_inspect(cbuff);
 
-    cbuff_add(&cbuff, 1);
-    cbuff_inspect(&cbuff);
+    cbuff_add(cbuff, 1);
+    cbuff_inspect(cbuff);
 
     return 0;
 }

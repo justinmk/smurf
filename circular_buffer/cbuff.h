@@ -20,8 +20,8 @@ typedef struct {
     int* buffer; /* points to buffer storage array */
 } cbuff_t;
 
-/* allocate space; set start location */
-void cbuff_init(cbuff_t* self, int size);
+/* creates and initializes a new cbuff object using the specified fixed size */
+cbuff_t* cbuff_init(int size);
 void cbuff_dispose(cbuff_t* self);
 /* insert an element in the location occurring after the last-modified location.
    if the buffer is full, the oldest element is overwritten. */
