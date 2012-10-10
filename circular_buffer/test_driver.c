@@ -1,33 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
 #include "cbuff.h"
+#include <cmockery.h>
 
 // http://code.google.com/p/mongoose/
 // http://stackoverflow.com/questions/7315936/which-of-fprintf-snprintf-is-more-secure
-// http://stackoverflow.com/a/4627539/152142
+// vsnprintf: http://stackoverflow.com/a/4627539/152142
 // http://news.ycombinator.com/item?id=3970870
 
+int tests_run = 0;
+int cbuff_size = 0;
+cbuff_t* cbuff;
 
-int main(int argc, char **argv) {
-    int cbuff_size = 0;
-    cbuff_t* cbuff;
+extern const char* get_status_code_string(const unsigned int status_code);
+extern unsigned int string_to_status_code(
+    const char* const status_code_string);
 
-    cbuff_size = atoi(argv[1]);
-
-    cbuff = cbuff_init(cbuff_size);
+void test_cbuff_lifecycle(void **state) {
     cbuff_inspect(cbuff);
 
-    if (CBUFF_EMPTY != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be CBUFF_EMPTY\n");
-    }
+    /* oldest element should be CBUFF_EMPTY */
+    assert_true(CBUFF_EMPTY == cbuff_remove(cbuff));
+
     cbuff_inspect(cbuff);
 
     cbuff_add(cbuff, 1);
     cbuff_inspect(cbuff);
 
-    if (1 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 1\n");
-    }
+    /* oldest element should be 1 */
+    assert_int_equal(1, cbuff_remove(cbuff));
+
     cbuff_inspect(cbuff);
 
     cbuff_remove(cbuff);
@@ -42,14 +47,10 @@ int main(int argc, char **argv) {
     cbuff_add(cbuff, 3);
     cbuff_inspect(cbuff);
 
-    if (1 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 1\n");
-    }
+    assert_int_equal(1, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
-    if (2 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 2\n");
-    }
+    assert_int_equal(2, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
     cbuff_add(cbuff, 4);
@@ -82,9 +83,7 @@ int main(int argc, char **argv) {
     cbuff_add(cbuff, 3);
     cbuff_inspect(cbuff);
 
-    if (5 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 5\n");
-    }
+    assert_int_equal(5, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
     cbuff_remove(cbuff);
@@ -99,33 +98,33 @@ int main(int argc, char **argv) {
     cbuff_remove(cbuff);
     cbuff_inspect(cbuff);
 
-    if (0 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 0\n");
-    }
+    assert_int_equal(0, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
-    if (1 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 1\n");
-    }
+    assert_int_equal(1, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
-    if (2 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 2\n");
-    }
+    assert_int_equal(2, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
     cbuff_add(cbuff, 1);
     cbuff_inspect(cbuff);
 
-    if (3 != cbuff_remove(cbuff)) {
-        fprintf(stderr, "ERROR: oldest element should be 3\n");
-    }
+    assert_int_equal(3, cbuff_remove(cbuff));
     cbuff_inspect(cbuff);
 
     cbuff_add(cbuff, 1);
     cbuff_inspect(cbuff);
+}
 
-    return 0;
+int main(int argc, char **argv) {
+    const UnitTest tests[] = {
+        unit_test(test_cbuff_lifecycle),
+    };
+    cbuff_size = atoi(argv[1]);
+    cbuff = cbuff_init(cbuff_size);
+
+    return run_tests(tests);
 }
 
 // http://linux.die.net/man/3/snprintf
