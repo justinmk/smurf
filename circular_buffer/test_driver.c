@@ -121,6 +121,12 @@ int main(int argc, char **argv) {
     const UnitTest tests[] = {
         unit_test(test_cbuff_lifecycle),
     };
+
+    if (!argv[1]) {
+        printf("missing argument\n");
+        return 1;
+    }
+
     cbuff_size = atoi(argv[1]);
     cbuff = cbuff_init(cbuff_size);
 

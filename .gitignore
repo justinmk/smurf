@@ -3,5 +3,6 @@
 *.o
 *.swp
 *.out
+*.stackdump
 .DS_Store
 
