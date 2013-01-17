@@ -15,7 +15,10 @@ void test_cbuff_lifecycle(void **state) {
 }
 
 int main(int argc, char **argv) {
-    char s[] = "foobarbaz\n";
+    /* gotcha: this _must_ be declared as an array explicitly.  
+       char* is stored in read-only memory (perhaps baked-into the compiled executable). */
+    char s[] = "foobarbaz\n"; 
+
     const UnitTest tests[] = {
         unit_test(test_cbuff_lifecycle),
     };
