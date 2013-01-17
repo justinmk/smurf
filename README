@@ -1,3 +1,10 @@
-toy projects
+Toy Projects
 
-"smurf" is a nonce word used in gaming subculture to mean "sandbox account" or "experimental".
+"smurf" is a nonce word in gaming subculture meaning "sandbox account" or "experimental".
+
+csharp/
+    Contains data structures and algorithms written in C# (Mono).
+    
+java/ 
+    Contains data structures and algorithms written in java (Eclipse).
+
