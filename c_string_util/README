@@ -1,0 +1,7 @@
+To compile and run unit tests:
+    clang -Wall -I ../cmocka/include/ ../cmocka/src/cmocka.c test_driver.c string_util.c && ./a.out
+
+
+test_driver.c:
+    Contains a main() entry point which runs unit tests using cmocka.
+    

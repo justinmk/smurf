@@ -5,6 +5,6 @@
 #include <stdlib.h>
 
 /* reverses a c-style string. */
-char* reverse_string(char* s);
+char* reverse_string_in_place(char* s);
 
 #endif
