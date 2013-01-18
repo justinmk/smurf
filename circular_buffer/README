@@ -1,5 +1,6 @@
 To compile and run sample tests on cbuff.c:
-    gcc -I ../cmockery/ -Wall test_driver.c cbuff.c ../cmockery/cmockery.c && ./a.exe 9
+    gcc -Wall -I ../cmocka/include ../cmocka/src/cmocka.c test_driver.c cbuff.c 
+    ./a.exe 9
 
 
 test_driver.c:

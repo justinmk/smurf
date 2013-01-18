@@ -3,8 +3,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <cmocka.h>
 #include "cbuff.h"
-#include <cmockery.h>
 
 // http://code.google.com/p/mongoose/
 // http://stackoverflow.com/questions/7315936/which-of-fprintf-snprintf-is-more-secure
@@ -14,10 +14,6 @@
 int tests_run = 0;
 int cbuff_size = 0;
 cbuff_t* cbuff;
-
-extern const char* get_status_code_string(const unsigned int status_code);
-extern unsigned int string_to_status_code(
-    const char* const status_code_string);
 
 void test_cbuff_lifecycle(void **state) {
     cbuff_inspect(cbuff);
