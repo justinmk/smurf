@@ -1,3 +1,5 @@
+package smurf;
+
 public class BinaryTreeNode<T> {
   public static interface BinaryTreeNodeVisitor<T> {
     void apply(BinaryTreeNode<T> n);

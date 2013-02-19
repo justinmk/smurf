@@ -1,3 +1,5 @@
+package smurf;
+
 import java.util.Stack;
 
 
