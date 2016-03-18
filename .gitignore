@@ -3,6 +3,7 @@ obj/
 *.exe
 *.dll
 *.o
+*.s
 *.swp
 *.out
 *.stackdump

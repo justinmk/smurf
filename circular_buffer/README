@@ -1,9 +1,0 @@
-To compile and run sample tests on cbuff.c:
-    gcc -Wall -I ../cmocka/include ../cmocka/src/cmocka.c test_driver.c cbuff.c 
-    ./a.exe 9
-
-
-test_driver.c:
-    Contains a main() entry point which exercises the circular buffer and prints 
-    debugging output to stdout.
-    
