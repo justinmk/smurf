@@ -1,3 +1,4 @@
+build/
 bin/
 obj/
 *.exe
@@ -9,3 +10,4 @@ obj/
 *.stackdump
 .DS_Store
 
+Xtest

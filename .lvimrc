@@ -1,1 +1,4 @@
-nn <buffer> <space> :<c-u>make<cr>
+nn <buffer> <space> :exe 'te UUT='.expand('%:r').' make'
+      \ \|exe "nnoremap <buffer> <lt>space> \<lt>C-\\><lt>C-n>:buffer #<lt>bar>bd! #<lt>cr>"
+      \ \|au TermClose <buffer> call feedkeys("\<lt>C-\>\<lt>C-n>")<CR>
+set et sw=2 ts=2

@@ -17,11 +17,11 @@ RingBuf *rb_init(size_t capacity) {
     printf("invalid capacity: %zu\n", capacity);
     return NULL;
   }
-  RingBuf *rb = malloc(sizeof(RingBuf) + (capacity * sizeof(ItemType)));
+  RingBuf *rb = malloc(sizeof(RingBuf));
   rb->rpos = 0;
   rb->wpos = 0;
   rb->capacity = capacity;
-  rb->items = malloc(capacity * sizeof(ItemType));
+  rb->items = malloc(capacity * sizeof(*rb->items));
 }
 int rb_free(RingBuf *rb) {
   if (NULL == rb) {
