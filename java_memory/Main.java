@@ -1,8 +1,11 @@
 // package smurf;
 import java.util.ArrayList;
+// import org.openjdk.jol.info.ClassLayout;
+// import org.openjdk.jol.util.VMSupport;
 
 public class Main {
   private static ArrayList g_cache = new ArrayList();
+  private static Object[] g_array;
   private static void printMem() {
     // Get current size of heap in bytes
     long heapSize = Runtime.getRuntime().totalMemory(); 
@@ -21,9 +24,15 @@ public class Main {
   public static void main(String [ ] args) {
     printMem();
 
-    for (int i = 0; i < 10000000; i++) {
-      g_cache.add(new Object());
-    }
+    // for (int i = 0; i < 1000000; i++) {
+    //   g_cache.add(new Object());
+    // }
+    g_array = new Object[1000000];
+
+    // System.out.println(VMSupport.vmDetails());
+    // System.out.println(ClassLayout.parseClass(Integer.class).toPrintable());
+    // System.out.println(String.format("objsize=%.2f",
+    //       Instrumentation.getObjectSize(g_cache)));
 
     printMem();
   }
