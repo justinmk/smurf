@@ -6,7 +6,4 @@ run: | all
 a.out: main.c
 	clang -lm main.c
 
-clean:
-	rm -f nvim/*.o nvim/*.so
-
-.PHONY: all run clean
+.PHONY: all run
