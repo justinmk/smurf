@@ -1,6 +1,7 @@
 build/
 bin/
 obj/
+venv/
 *.exe
 *.dll
 *.o
