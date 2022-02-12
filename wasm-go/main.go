@@ -24,6 +24,7 @@
 // debug wasm in Chrome: https://developer.chrome.com/blog/wasm-debugging-2020/
 //
 // TODO:
+//    why is nodejs much slower than Chrome?
 //    import main.wasm (import its types, call its functions) from host?
 //      import * as M from './add.wasm';
 //    wasm_exec.js probably is only needed for browser (or entrypoint for nodejs)
