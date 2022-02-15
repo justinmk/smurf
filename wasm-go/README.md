@@ -1,41 +1,74 @@
-WASM experience report
-======================
+WASM as a shared library
+========================
+
+- goal: reusable common library that can be shared with all Toolkits (VSCode, JetBrains, Visual Studio, …)
 
 summary
 ------------
-- compiled a Go library 
 
-tried
+- tried "fancy" WASM runtimes.
+- "vanilla" WASM works better than expected.
+- authored some AWS logic in Go
+    - used it in browser, nodejs
+
+"fancy" WASM runtimes
 ------------
 1. wasmer
     - X extra layer/ecosystem, immature tooling
-2. AssemblyScript
+2. [AssemblyScript](https://www.assemblyscript.org/)
     - X extra layer, immature, no gain vs e.g. Go/Rust/etc.
-3. vanilla WASM
-    - some platforms such as Go "just work"
 
-vanilla WASM: Go + WASM
+vanilla WASM (+ Go)
 ------------
+some platforms such as Go "just work".
+
 - go: fast, easy. supports WASM out of the box.
 - vs...
    - kotlin: requires "kotlin native" + limitations
    - rust: exported functions are automatically available?
 
-Go + WASM: state of the art
+WASM (+ Go): state of the art
 ------------
 
 ### good
 - super fast ramp up (developer setup, dev-test cycle)
 - AWS SDK for Go appears to "just work" in WASM
-- Go features like goroutines "just work" in WASM
+- Go features like goroutines, `net/http` "just work" in WASM
 
-### bad
-- data passed to host as JS objects; typed hosts will likely want to map to formal types
-    - BUT, we already do this with even native clients!
-- shared types, typed parameters (like Microsoft COM)
-    - FUTURE: proposed WASM feature
-- closures
-    - FUTURE: proposed WASM feature
+WASM (+ Go): state of the art
+------------
+
+### limitations
+- only supports primitive data types (int, string, maps, …)
+    - non-primitives must be serialized
+        - BUT, we already do this with "native" clients...
+        - comparable to RPC, FFI...
+- no shared closures
+    - FUTURE: [WASM proposal: function references](https://github.com/WebAssembly/function-references/blob/master/proposals/function-references/Overview.md)
+- no shared types (like Microsoft COM)
+    - FUTURE: [WASM proposal: interface types](https://github.com/WebAssembly/interface-types/blob/main/proposals/interface-types/Explainer.md)
+    - FUTURE: [WASM proposal: type imports/exports](https://github.com/WebAssembly/proposal-type-imports)
+- debug WASM via printf or raw assembly
+    - FUTURE: debug wasm in Chrome: https://developer.chrome.com/blog/wasm-debugging-2020/
+
+
+WASM (+ Go): state of the art
+------------
+
+- `main.wasm` = 10M
+- to export a function: `js.Global().Set("myFunc", fn)`
+- WASM [works in vscode](https://github.com/microsoft/vscode/issues/65559#issuecomment-751439479)
+
+ramp up / quick start
+---------------------
+
+2. install Go
+3. install aws-sdk-go
+4. author some code (`main.go`)
+5. build
+    - `GOOS=js GOARCH=wasm go build -o main.wasm`
+
+reference: https://github.com/golang/go/wiki/WebAssembly#getting-started
 
 
 bridge
@@ -48,12 +81,10 @@ export a map of functions to JS:
 
 conclusion
 ------------
-wasm + go is viable for a shared library that can be loaded in the browser sandbox, nodejs, kotlin, C#, and of course any dynamic language that has a wasm runtime.
-compares favorably to RPC and FFI on most (all?) dimensions.
-missing: typed marshaling, closures (ergonomics)
+- wasm + go is viable for a shared library.
+- compares favorably to RPC and FFI on most (all?) dimensions.
 
 xxxxxxxxx
 -----------
-
 - https://github.com/stdiopt/gowasm-experiments
 - https://github.com/golang/go/wiki/WebAssembly#further-examples
