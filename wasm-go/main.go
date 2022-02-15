@@ -1,10 +1,14 @@
 // go-wasm vs...
+//    go: fast, easy.
 //    kotlin: requires "kotlin native" + limitations
+//    rust: exported functions are automatically available?
 //
 // notes
 //    main.wasm = 12M
 //    goroutines work?!
 //    net/http works!
+//    to export a function: js.Global().Set("myFunc", fn)
+//    wasm in vscode extension: https://github.com/microsoft/vscode/issues/65559#issuecomment-751439479
 //
 // getting started
 //    https://github.com/golang/go/wiki/WebAssembly#getting-started
@@ -18,6 +22,8 @@
 //
 // run in nodejs:
 //    node wasm_exec.js main.wasm
+//    OR:
+//    node node_main.js
 //
 // https://github.com/golang/go/wiki/WebAssembly#configuring-fetch-options-while-using-nethttp
 //
@@ -38,6 +44,8 @@
 package main
 
 import (
+	"syscall/js" // wasm. https://medium.com/swlh/getting-started-with-webassembly-and-go-by-building-an-image-to-ascii-converter-dea10bdf71f6
+
 	"context"
 	"flag"
 	"fmt"
@@ -64,7 +72,7 @@ import (
 // Usage:
 //   # Upload myfile.txt to myBucket/myKey. Must complete within 10 minutes or will fail
 //   go run withContext.go -b mybucket -k myKey -d 10m < myfile.txt
-func awsstuff() {
+func awsstuff() error {
 	var bucket, key string
 	var timeout time.Duration
 
@@ -74,16 +82,16 @@ func awsstuff() {
 	flag.Parse()
 
 	// All clients require a Session. The Session provides the client with
-      // shared configuration such as region, endpoint, and credentials. A
-      // Session should be shared where possible to take advantage of
-      // configuration and credential caching. See the session package for
-      // more information.
+	// shared configuration such as region, endpoint, and credentials. A
+	// Session should be shared where possible to take advantage of
+	// configuration and credential caching. See the session package for
+	// more information.
 	sess := session.Must(session.NewSession())
 
-      // Create a new instance of the service's client with a Session.
-      // Optional aws.Config values can also be provided as variadic arguments
-      // to the New function. This option allows you to provide service
-      // specific configuration.
+	// Create a new instance of the service's client with a Session.
+	// Optional aws.Config values can also be provided as variadic arguments
+	// to the New function. This option allows you to provide service
+	// specific configuration.
 	svc := s3.New(sess)
 
 	// Create a context with a timeout that will abort the upload if it takes
@@ -95,9 +103,9 @@ func awsstuff() {
 	}
 	// Ensure the context is canceled to prevent leaking.
 	// See context package for more information, https://golang.org/pkg/context/
-      if cancelFn != nil {
+	if cancelFn != nil {
 		defer cancelFn()
-      }
+	}
 
 	// Uploads the object to S3. The Context will interrupt the request if the
 	// timeout expires.
@@ -114,20 +122,21 @@ func awsstuff() {
 		} else {
 			fmt.Fprintf(os.Stderr, "failed to upload object, %v\n", err)
 		}
-		os.Exit(1)
+		return err
 	}
 
 	fmt.Printf("successfully uploaded file to %s/%s\n", bucket, key)
+	return nil
 }
 
-func test(i int) {
+func Test(i int) {
 	fmt.Printf("Hello, WebAssembly! %v\n", 41 + i)
 }
 
 func waittt() {
     channel := make(chan int)
     go func() {
-        time.Sleep(3*time.Second)
+        time.Sleep(300*time.Second)
         channel <- 1 // Sending something to the channel to let the main thread continue
         channel <- 2
     }()
@@ -138,12 +147,22 @@ func waittt() {
     }
 }
 
+// https://stackoverflow.com/q/55536425
 func main() {
+	c := make(chan bool)
+        // js.Global().Set("Test", js.FuncOf(Test))
+        // func(js.Value, []js.Value) interface {}
+        js.Global().Set("Test", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+          return "test succeedeeddddd"
+        }))
 	fmt.Printf("Hello, WebAssembly! %v\n", 41 + 1)
         awsstuff()
-        go test(1)
-        go test(2)
-        go test(3)
+        go Test(1)
+        go Test(2)
+        go Test(3)
         waittt()
+	// Do not exit, wait forever (act as a library).
+	<-c
 }
 

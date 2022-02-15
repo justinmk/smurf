@@ -20,6 +20,8 @@ WebAssembly.instantiate(typedArray, {
 }).then(result => {
   console.log(util.inspect(result, true, 0));
   console.log(result.instance.exports._add(9, 9));
+  // exported Test() function from main.go
+  wasm.Test(7234)
 }).catch(e => {
   // error caught
   console.log(e);
