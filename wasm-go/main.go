@@ -1,8 +1,3 @@
-// go-wasm vs...
-//    go: fast, easy.
-//    kotlin: requires "kotlin native" + limitations
-//    rust: exported functions are automatically available?
-//
 // notes
 //    main.wasm = 12M
 //    goroutines work!
@@ -49,7 +44,8 @@ package main
 import (
 	"syscall/js" // wasm. https://medium.com/swlh/getting-started-with-webassembly-and-go-by-building-an-image-to-ascii-converter-dea10bdf71f6
 
-	// "context"
+	"context"
+	"log"
 	// "flag"
 	// "os"
 
@@ -57,18 +53,9 @@ import (
 	"time"
 	"encoding/json"
 
-	// TODO switch to v2
-	// 	"github.com/aws/aws-sdk-go-v2/aws"
-	// 	"github.com/aws/aws-sdk-go-v2/config"
-	// 	"github.com/aws/aws-sdk-go-v2/service/s3"
-
-	// "github.com/aws/aws-sdk-go/aws"
-	// "github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/external"
-	// "github.com/aws/aws-sdk-go/aws/awserr"
-	// "github.com/aws/aws-sdk-go/aws/request"
-	// "github.com/aws/aws-sdk-go/aws/session"
-	// "github.com/aws/aws-sdk-go/service/s3"
+	// "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 )
 
@@ -160,6 +147,42 @@ func waittt() {
     }
 }
 
+func listbuckets() string {
+	// creds := credentials.NewStaticCredentials("AKID", "SECRET", "SESSION")
+	// creds := credentials.NewStaticCredentials()
+
+	// Load the Shared AWS Configuration (~/.aws/config)
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Create an Amazon S3 service client
+	client := s3.NewFromConfig(cfg)
+
+	// Get the first page of results for ListObjectsV2 for a bucket
+	// output, err := client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
+	// 	Bucket: aws.String("my-bucket"),
+	// })
+
+	output, err := client.ListBuckets(context.TODO(), &s3.ListBucketsInput{})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("first page results:")
+	for _, bucket := range output.Buckets {
+		log.Println(*bucket.Name + ": " + bucket.CreationDate.Format("2006-01-02 15:04:05 Monday"))
+
+	}
+
+	r, err2 := json.Marshal(cfg)
+	if err2 != nil {
+		return ""
+	}
+	return string(r)
+}
+
 // https://stackoverflow.com/q/55536425
 func main() {
 	c := make(chan bool)
@@ -170,18 +193,7 @@ func main() {
 			return "test 1 result"
 		}),
 		"test2": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			// creds := credentials.NewStaticCredentials("AKID", "SECRET", "SESSION")
-			// creds := credentials.NewStaticCredentials()
-			creds := external.LoadDefaultAWSConfig()
-			creds2, err := creds.Get()
-			if err != nil {
-				return nil
-			}
-			r, err2 := json.Marshal(creds2)
-			if err2 != nil {
-				return nil
-			}
-			return string(r)
+			return listbuckets()
 		}),
 	}
         js.Global().Set("foo", exportMap)
@@ -192,6 +204,7 @@ func main() {
         go Test(2)
         go Test(3)
         waittt()
+	listbuckets()
 	// Do not exit, wait forever (act as a library).
 	<-c
 }
