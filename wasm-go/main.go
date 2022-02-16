@@ -193,7 +193,15 @@ func main() {
 			return "test 1 result"
 		}),
 		"test2": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return listbuckets()
+			// https://pkg.go.dev/syscall/js#FuncOf
+			// > if one wrapped function blocks, JavaScript's event
+			// > loop is blocked until that function returns.
+			// > Hence, calling any async JavaScript API, which
+			// > requires the event loop, like fetch (http.Client),
+			// > will cause an immediate deadlock. Therefore
+			// > a blocking function should explicitly start a new goroutine.
+			go listbuckets()
+			return ""
 		}),
 	}
         js.Global().Set("foo", exportMap)

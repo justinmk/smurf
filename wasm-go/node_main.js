@@ -4,6 +4,14 @@ const fs = require('fs');
 // XXX: puts "Go" in global scope.
 const goWasm = require('./wasm_exec');
 
+// patch in fetch for nodejs (will ship with future versions of node)
+global.fetch = require('node-fetch')
+// global.Headers = fetch.Headers;
+console.log(fetch)
+global.Headers = fetch.Headers
+new fetch.Headers({'content-type': 'application/json'})
+
+
 // var wasm = fs.readFileSync('./main.wasm');
 // const env = {
 //     memoryBase: 0,

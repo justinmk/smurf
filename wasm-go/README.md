@@ -51,3 +51,9 @@ conclusion
 wasm + go is viable for a shared library that can be loaded in the browser sandbox, nodejs, kotlin, C#, and of course any dynamic language that has a wasm runtime.
 compares favorably to RPC and FFI on most (all?) dimensions.
 missing: typed marshaling, closures (ergonomics)
+
+xxxxxxxxx
+-----------
+
+- https://github.com/stdiopt/gowasm-experiments
+- https://github.com/golang/go/wiki/WebAssembly#further-examples
