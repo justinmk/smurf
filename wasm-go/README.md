@@ -9,7 +9,8 @@ summary
 - tried "fancy" WASM runtimes.
 - "vanilla" WASM works better than expected.
 - authored some AWS logic in Go
-    - used it in browser, nodejs
+- works in browser, nodejs
+- TODO: vscode, jetbrains, visualstudio
 
 "fancy" WASM runtimes
 ------------
@@ -58,6 +59,9 @@ WASM (+ Go): state of the art
 - `main.wasm` = 10M
 - to export a function: `js.Global().Set("myFunc", fn)`
 - WASM [works in vscode](https://github.com/microsoft/vscode/issues/65559#issuecomment-751439479)
+- for network (`net/http` in Go), need `fetch`
+    - shipped with all browsers
+    - shipped with Node since 17.5 (`node --experimental-fetch`)
 
 ramp up / quick start
 ---------------------
@@ -68,7 +72,11 @@ ramp up / quick start
 5. build
     - `GOOS=js GOARCH=wasm go build -o main.wasm`
 
-reference: https://github.com/golang/go/wiki/WebAssembly#getting-started
+reference
+---------
+- https://github.com/golang/go/wiki/WebAssembly#getting-started
+- https://github.com/stdiopt/gowasm-experiments
+- https://github.com/golang/go/wiki/WebAssembly#further-examples
 
 
 bridge
@@ -79,12 +87,18 @@ export a map of functions to JS:
     js.Global().Set("foo", exportMap)
 
 
+project structure
+-----------------
+- `wasm_exec.js` should match the Go version.
+    - it comes from `"$(go env GOROOT)/misc/wasm/wasm_exec.js"`
+
 conclusion
 ------------
 - wasm + go is viable for a shared library.
 - compares favorably to RPC and FFI on most (all?) dimensions.
 
-xxxxxxxxx
------------
-- https://github.com/stdiopt/gowasm-experiments
-- https://github.com/golang/go/wiki/WebAssembly#further-examples
+next steps
+----------
+- in nodejs need to import `fetch` or use `node --experimental-fetch` (Node 17.5)
+- test Kotlin/JetBrains
+- test C#/VisualStudio

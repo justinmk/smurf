@@ -6,7 +6,8 @@
 //    ~/go/bin/goexec 'http.ListenAndServe(`:8080`, http.FileServer(http.Dir(`.`)))'
 //
 // run in nodejs:
-//    node node_main.js
+//    # fetch available since node 17.5: https://nodejs.org/en/blog/release/v17.5.0/
+//    node --experimental-fetch node_main.js
 //
 // run in vscode extension:
 //    import 'wasm_exec'
@@ -75,7 +76,7 @@ type s struct {
 }
 
 func (s s) Do(r *http.Request) (*http.Response, error) {
-	// Set fetch options to force browser "localhost:8080" to work.
+	// "no-cors" needed in browser (not nodejs) for "localhost:8080".
 	// https://github.com/golang/go/wiki/WebAssembly#configuring-fetch-options-while-using-nethttp
 	r.Header.Add("js.fetch:mode", "no-cors")
 	// r.Header.Add("js.fetch:credentials", "include")
@@ -88,7 +89,6 @@ func listbuckets() string {
 	// creds := credentials.NewStaticCredentials()
 
 	// Load the Shared AWS Configuration (~/.aws/config)
-	// cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion("us-west-2"))
 	fmt.Printf("here 0\n")
 	staticProvider := credentials.NewStaticCredentialsProvider(
 		"xxx", "xxx", "",
@@ -173,11 +173,10 @@ func main() {
 	js.Global().Set("foo", exportMap)
 
 	fmt.Printf("Hello, WebAssembly! %v\n", 41+1)
-	// awsstuff()
+	listbuckets()
 	go Test(1)
 	go Test(2)
 	go Test(3)
-	listbuckets()
 	waittt()
 	// Do not exit, wait forever (act as a library).
 	<-c
