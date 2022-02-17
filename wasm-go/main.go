@@ -7,7 +7,7 @@
 //
 // run in nodejs:
 //    # fetch available since node 17.5: https://nodejs.org/en/blog/release/v17.5.0/
-//    node --experimental-fetch node_main.js
+//    node --experimental-fetch --experimental-wasi-unstable-preview1 node_main.js
 //
 // run in vscode extension:
 //    import 'wasm_exec'
@@ -33,6 +33,7 @@ import (
 
 	"context"
 	"log"
+	"io/ioutil"
 
 	// "flag"
 	// "os"
@@ -44,11 +45,9 @@ import (
 	// Overview: https://aws.github.io/aws-sdk-go-v2/docs/migrating/
 	// "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"net/http"
-
 	// awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	// "github.com/aws/aws-sdk-go-v2/aws/external"
 )
@@ -84,15 +83,21 @@ func (s s) Do(r *http.Request) (*http.Response, error) {
 	return s.cl.Do(r)
 }
 
+func listDir() {
+	files, err := ioutil.ReadDir("./")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, f := range files {
+		fmt.Println(f.Name())
+	}
+}
+   
 func listbuckets() string {
 	// creds := credentials.NewStaticCredentials("AKID", "SECRET", "SESSION")
-	// creds := credentials.NewStaticCredentials()
 
 	// Load the Shared AWS Configuration (~/.aws/config)
-	fmt.Printf("here 0\n")
-	staticProvider := credentials.NewStaticCredentialsProvider(
-		"xxx", "xxx", "",
-	)
 	fmt.Printf("here 1\n")
 
 	// httpClient := awshttp.NewBuildableClient().WithTransportOptions(func(tr *http.Transport) {
@@ -100,24 +105,38 @@ func listbuckets() string {
 	// 	tr.MaxIdleConns = 10
 	// })
 
-	cfg, err := config.LoadDefaultConfig(
-		context.Background(),
-		config.WithCredentialsProvider(staticProvider),
-		config.WithRegion("us-west-2"),
-		// https://stackoverflow.com/a/68955337/152142
-		config.WithHTTPClient(s{http.Client{}}),
-		// config.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
-		// 	return aws.Endpoint{
-		// 		PartitionID:       "aws",
-		// 		URL:               "http://localhost:4566",
-		// 		SigningRegion:     "eu-west-1",
-		// 		HostnameImmutable: true,
-		// 		// Source:        aws.EndpointSourceCustom,
-		// 	}, nil
-		// })),
-	)
-	fmt.Printf("here 2\n")
+	// cfg, err := config.LoadSharedConfigProfile(context.Background(), "default")
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	// cfg, err := config.LoadDefaultConfig(
+	// context.Background(),
+	// config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider()),
+	// config.WithSharedConfigProfile("default"),
+	// config.WithRegion("us-west-2"),
+	// https://stackoverflow.com/a/68955337/152142
+	// config.WithHTTPClient(s{http.Client{}}),
+	// config.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+	// 	return aws.Endpoint{
+	// 		PartitionID:       "aws",
+	// 		URL:               "http://localhost:4566",
+	// 		SigningRegion:     "eu-west-1",
+	// 		HostnameImmutable: true,
+	// 		// Source:        aws.EndpointSourceCustom,
+	// 	}, nil
+	// })),
+	// )
+
+	envcfg, err := config.NewEnvConfig()
 	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("env.AccessKeyID=" + envcfg.Credentials.AccessKeyID)
+	fmt.Println("env.SessionToken=" + envcfg.Credentials.SessionToken)
+	fmt.Printf("env.HasKeys=%v\n", envcfg.Credentials.HasKeys())
+
+	retrieveResult, retrieveErr := cfg.Credentials.Retrieve(context.Background())
+
+	fmt.Printf("AWS credentials:\n    region=%v\n    key=%v\n    error: %v\n", cfg.Region, retrieveResult.AccessKeyID, retrieveErr)
+	if err != nil || retrieveErr != nil {
 		log.Fatal(err)
 	}
 
@@ -166,13 +185,15 @@ func main() {
 			// > requires the event loop, like fetch (http.Client),
 			// > will cause an immediate deadlock. Therefore
 			// > a blocking function should explicitly start a new goroutine.
-			go listbuckets()
+
+			// go listbuckets()
 			return ""
 		}),
 	}
 	js.Global().Set("foo", exportMap)
 
 	fmt.Printf("Hello, WebAssembly! %v\n", 41+1)
+	listDir()
 	listbuckets()
 	go Test(1)
 	go Test(2)
