@@ -40,18 +40,18 @@ class Program
     {
         int i = 0;
 
-        Foo(i, 10000); // jitter 
-        Sum(10000);
+        Foo(i, 99999); // jitter 
+        Sum(99999);
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
-        Foo(i, 10000);
+        Foo(i, 99999);
         stopwatch.Stop();
         Console.WriteLine(string.Format("time of execution = {0}ms",stopwatch.ElapsedMilliseconds));
 
         stopwatch = new Stopwatch();
         stopwatch.Start();
-        Sum(10000);
+        Sum(99999);
         stopwatch.Stop();
         Console.WriteLine(string.Format("time of execution = {0}ms", stopwatch.ElapsedMilliseconds));
     }

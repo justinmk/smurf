@@ -32,15 +32,14 @@ import (
 	"syscall/js" // wasm. https://medium.com/swlh/getting-started-with-webassembly-and-go-by-building-an-image-to-ascii-converter-dea10bdf71f6
 
 	"context"
-	"log"
 	"io/ioutil"
+	"log"
 
 	// "flag"
 	// "os"
 
 	"encoding/json"
 	"fmt"
-	"time"
 
 	// Overview: https://aws.github.io/aws-sdk-go-v2/docs/migrating/
 	// "github.com/aws/aws-sdk-go-v2/aws"
@@ -51,24 +50,6 @@ import (
 	// awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	// "github.com/aws/aws-sdk-go-v2/aws/external"
 )
-
-func Test(i int) {
-	fmt.Printf("Hello, WebAssembly! %v\n", 41+i)
-}
-
-func waittt() {
-	channel := make(chan int)
-	go func() {
-		time.Sleep(300 * time.Second)
-		channel <- 1 // Sending something to the channel to let the main thread continue
-		channel <- 2
-	}()
-
-	for {
-		fmt.Println("../")
-		<-channel // Waiting for something to come from the channel
-	}
-}
 
 type s struct {
 	cl http.Client
@@ -93,75 +74,54 @@ func listDir() {
 		fmt.Println(f.Name())
 	}
 }
-   
+
 func listbuckets() string {
-	// creds := credentials.NewStaticCredentials("AKID", "SECRET", "SESSION")
-
-	// Load the Shared AWS Configuration (~/.aws/config)
-	fmt.Printf("here 1\n")
-
 	// httpClient := awshttp.NewBuildableClient().WithTransportOptions(func(tr *http.Transport) {
 	// 	tr.ExpectContinueTimeout = 0
 	// 	tr.MaxIdleConns = 10
 	// })
 
-	// cfg, err := config.LoadSharedConfigProfile(context.Background(), "default")
-	cfg, err := config.LoadDefaultConfig(context.Background())
-	// cfg, err := config.LoadDefaultConfig(
-	// context.Background(),
-	// config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider()),
-	// config.WithSharedConfigProfile("default"),
-	// config.WithRegion("us-west-2"),
-	// https://stackoverflow.com/a/68955337/152142
-	// config.WithHTTPClient(s{http.Client{}}),
-	// config.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
-	// 	return aws.Endpoint{
-	// 		PartitionID:       "aws",
-	// 		URL:               "http://localhost:4566",
-	// 		SigningRegion:     "eu-west-1",
-	// 		HostnameImmutable: true,
-	// 		// Source:        aws.EndpointSourceCustom,
-	// 	}, nil
-	// })),
-	// )
+	// Load the Shared AWS Configuration (~/.aws/config)
+	cfg, err := config.LoadDefaultConfig(
+		context.Background(),
+		// config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(credentials.NewStaticCredentials(…))),
+		// config.WithSharedConfigProfile("default"),
+		// config.WithRegion("us-west-2"),
+		// https://stackoverflow.com/a/68955337/152142
+		config.WithHTTPClient(s{http.Client{}}),
+		// config.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		// 	return aws.Endpoint{
+		// 		PartitionID:       "aws",
+		// 		URL:               "http://localhost:4566",
+		// 		SigningRegion:     "eu-west-1",
+		// 		HostnameImmutable: true,
+		// 		// Source:        aws.EndpointSourceCustom,
+		// 	}, nil
+		// })),
+	)
 
-	envcfg, err := config.NewEnvConfig()
-	if err != nil {
+	creds, credsErr := cfg.Credentials.Retrieve(context.Background())
+	if credsErr != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("env.AccessKeyID=" + envcfg.Credentials.AccessKeyID)
-	fmt.Println("env.SessionToken=" + envcfg.Credentials.SessionToken)
-	fmt.Printf("env.HasKeys=%v\n", envcfg.Credentials.HasKeys())
-
-	retrieveResult, retrieveErr := cfg.Credentials.Retrieve(context.Background())
-
-	fmt.Printf("AWS credentials:\n    region=%v\n    key=%v\n    error: %v\n", cfg.Region, retrieveResult.AccessKeyID, retrieveErr)
-	if err != nil || retrieveErr != nil {
-		log.Fatal(err)
-	}
+	fmt.Printf("AWS credentials:\n    region=%v\n    accesskey=%v\n    error: %v\n", cfg.Region, creds.AccessKeyID, credsErr)
 
 	// Create an Amazon S3 service client
 	client := s3.NewFromConfig(cfg)
-	fmt.Printf("here 3\n")
-
-	// Get the first page of results for ListObjectsV2 for a bucket
-	// output, err := client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
-	// 	Bucket: aws.String("my-bucket"),
-	// })
-
 	output, err := client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
-	fmt.Printf("here 4\n")
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("first page results:")
+	fmt.Printf("S3 buckets:\n")
+	i := 0
 	for _, bucket := range output.Buckets {
-		fmt.Printf(*bucket.Name + ": " + bucket.CreationDate.Format("2006-01-02 15:04:05 Monday"))
-
+		if i > 10 {
+			break
+		}
+		fmt.Printf("    %v: %v\n", *bucket.Name, bucket.CreationDate.Format("2006-01-02 15:04:05 Monday"))
+		i++
 	}
-	fmt.Printf("here 5\n")
 
 	r, err2 := json.Marshal(cfg)
 	if err2 != nil {
@@ -195,10 +155,6 @@ func main() {
 	fmt.Printf("Hello, WebAssembly! %v\n", 41+1)
 	listDir()
 	listbuckets()
-	go Test(1)
-	go Test(2)
-	go Test(3)
-	waittt()
 	// Do not exit, wait forever (act as a library).
 	<-c
 }

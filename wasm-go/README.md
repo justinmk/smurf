@@ -1,6 +1,6 @@
 # WASM as a shared library
 
-- goal: reusable common library that can be shared with all Toolkits (VSCode, JetBrains, Visual Studio, …)
+* goal: reusable common library that can be shared with all Toolkits (VSCode, JetBrains, Visual Studio, …)
 
 ## summary
 
@@ -11,22 +11,25 @@
 * TODO: vscode, jetbrains, visualstudio
 
 ## "fancy" WASM runtimes
+
 1. wasmer
     1. X extra layer/ecosystem, immature tooling
 2. [AssemblyScript](https://www.assemblyscript.org/)
     1. X extra layer, immature, no gain vs e.g. Go/Rust/etc.
 
 ## vanilla WASM (+ Go)
+
 some platforms such as Go "just work".
 
 * go: fast, easy. supports WASM out of the box.
 * vs...
-   * kotlin: requires "kotlin native" + limitations
-   * rust: exported functions are automatically available?
+    * kotlin: requires "kotlin native" + limitations
+    * rust: exported functions are automatically available?
 
 ## WASM (+ Go): state of the art
 
 ### good
+
 * super fast ramp up (developer setup, dev-test cycle)
 * AWS SDK for Go appears to "just work" in WASM
 * Go features like goroutines, `net/http` "just work" in WASM
@@ -34,6 +37,7 @@ some platforms such as Go "just work".
 ## WASM (+ Go): state of the art
 
 ### limitations
+
 * only supports primitive data types (int, string, maps, …)
     * non-primitives must be serialized
         * BUT, we already do this with "native" clients...
@@ -60,10 +64,17 @@ some platforms such as Go "just work".
 
 ## ramp up / quick start
 
-2. install Go
-3. install aws-sdk-go
-4. author some code (`main.go`)
-5. build: `GOOS=js GOARCH=wasm go build -o main.wasm`
+We need a WASM library and some sort of application or script that loads it.
+
+1. install Go
+2. install aws-sdk-go
+3. author some library code (`main.go`)
+3. author some application code
+    * Example: `node_main.js` is a Node script loads and invokes the WASM library.
+4. build: `GOOS=js GOARCH=wasm go build -o main.wasm`
+5. run the code
+    * Example: `node --experimental-fetch --experimental-wasi-unstable-preview1 node_main.js`
+        * nodejs doesn't ship with `fetch` yet so we need `--experimental-fetch`
 
 ## reference
 * https://github.com/golang/go/wiki/WebAssembly#getting-started
@@ -72,22 +83,23 @@ some platforms such as Go "just work".
 * WASI: https://github.com/bytecodealliance/wasmtime/blob/main/docs/WASI-tutorial.md
 * nodejs WASI: https://nodejs.org/api/wasi.html
 
-
 ## bridge
 
 * export a map of functions to JS: `js.Global().Set("foo", exportMap)`
 
-
 ## project structure
+
 * `wasm_exec.js` should match the Go version.
     * it comes from `"$(go env GOROOT)/misc/wasm/wasm_exec.js"`
 
 ## conclusion
+
 * wasm + go is viable for a shared library.
     * may need to wait on WASI for use of network/filesystem in non-NodeJS platforms (Java, .NET).
 * compares favorably to RPC and FFI on most dimensions.
 
 ## next steps
+
 * in nodejs need to import `fetch` or use `node --experimental-fetch` (Node 17.5)
 * test vscode
 * test Kotlin/JetBrains.
