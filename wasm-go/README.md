@@ -1,6 +1,21 @@
 # WASM as a shared library
 
-* goal: reusable common library that can be shared with all Toolkits (VSCode, JetBrains, Visual Studio, …)
+> An experience report on using WASM as a cross-platform code sharing solution.
+
+## background
+
+To share code across platforms in a portable library, the story up to now has been C libs (`.so`, `.dylib`, `.dll).
+This is approximately because (1) most sytems have a C runtime and (2) most programming languages have interop with the C ABI ("FFI").
+But C as the common substrate isn't great because (1) people don't want to write C, (2) building and distributing the C libs takes finesse, (3) marshalling to/from C to/from the host language is awkward and bespoke.
+Common workaround is various forms of transpilation: Cordova, macros
+
+Because operating systems failed at their job, "the web" emerged as the
+actual lowest common denominator and most cross-platform viable runtime.
+Unlike C libs, the web has sandboxing and a delivery model with URIs.
+Blame the OS vendors.
+
+WebAssembly (WASM) looks like a good answer for a more secure and reliable way to share code in the web _plus_ traditional native applications.
+
 
 ## summary
 
@@ -67,7 +82,7 @@ some platforms such as Go "just work".
 We need a WASM library and some sort of application or script that loads it.
 
 1. install Go
-2. install aws-sdk-go
+2. install [aws-sdk-go-v2](https://github.com/aws/aws-sdk-go-v2)
 3. author some library code (`main.go`)
 3. author some application code
     * Example: `node_main.js` is a Node script loads and invokes the WASM library.
