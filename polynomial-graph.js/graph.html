@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Function Graph</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="a-input">Parameter a: </label>
+        <input type="number" id="a-input" value="0" step="0.1">
+        <label for="b-input">Parameter b: </label>
+        <input type="number" id="b-input" value="1" step="0.1">
+        <label for="c-input">Parameter c: </label>
+        <input type="number" id="c-input" value="2" step="0.1">
+    </div>
+    <canvas id="graph" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('graph');
+        const ctx = canvas.getContext('2d');
+        const aInput = document.getElementById('a-input');
+        const bInput = document.getElementById('b-input');
+        const cInput = document.getElementById('c-input');
+
+        // Graph parameters
+        const width = canvas.width;
+        const height = canvas.height;
+        const originX = width / 2;
+        const originY = height / 2;
+        const scale = 20; // Pixels per unit
+
+        // General function to draw any mathematical function
+        function drawGraph(func, equationText) {
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Get current a and b values
+            const a = parseFloat(aInput.value) || 0;
+            const b = parseFloat(bInput.value) || 0;
+            const c = parseFloat(cInput.value) || 0;
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 1;
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            // Draw grid
+            ctx.strokeStyle = '#ddd';
+            for (let x = 0; x <= width; x += scale) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+            }
+            for (let y = 0; y <= height; y += scale) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+            }
+            ctx.stroke();
+
+            // Draw the custom function
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+
+            let firstPoint = true;
+
+            for (let canvasX = 0; canvasX <= width; canvasX++) {
+                const x = (canvasX - originX) / scale;
+                const y = func(x, a, b, c); // Call the provided function
+                const canvasY = originY - (y * scale);
+
+                // Skip if point is way off-screen
+                if (canvasY < -1000 || canvasY > 1000) continue;
+
+                if (firstPoint) {
+                    ctx.moveTo(canvasX, canvasY);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
+
+            // Draw equation text
+            ctx.fillStyle = 'black';
+            ctx.font = '14px Arial';
+            ctx.fillText(equationText(a, b, c), 10, 20);
+        }
+
+        // Example: Exponential function
+        const exponentialFunc = (x, a, b, c) => Math.pow(x, a) + Math.pow(x, b) + Math.pow(x, c);
+        // const exponentialText = (a, b, c) => `y = ${a} * ${b}^x`;
+        const exponentialText = (a, b, c) => `y = x^${a} + x^${b} + x^${c}`;
+
+        // Initial draw with exponential function
+        drawGraph(exponentialFunc, exponentialText);
+
+        // Event listeners for input changes
+        function updateGraph() {
+            drawGraph(exponentialFunc, exponentialText);
+        }
+        aInput.addEventListener('input', updateGraph);
+        bInput.addEventListener('input', updateGraph);
+        cInput.addEventListener('input', updateGraph);
+
+        // Example of how to switch to a different function:
+        // const quadraticFunc = (x, a, b) => a * x * x + b;
+        // const quadraticText = (a, b) => `y = ${a}x² + ${b}`;
+        // drawGraph(quadraticFunc, quadraticText);
+    </script>
+</body>
+</html>
